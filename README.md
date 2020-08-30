@@ -1,2 +1,3 @@
-# algorithm
-알고리즘 문제 가끔씩 풀기 🙄
+# 보는 책 리스트
+
+-   Data Structures and Algorithms in Python
