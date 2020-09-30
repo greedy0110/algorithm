@@ -1,10 +1,10 @@
+# import random
 import math
 import sys
 
 
 def input(): return sys.stdin.readline().strip()
 
-# import random
 
 # arr [start, mid) 정렬된 배열 일 때
 # arr [mid, end) 정렬된 배열 일 때
@@ -47,5 +47,4 @@ def merge_sort(arr, start, end):
 arr = [int(input()) for _ in range(int(input()))]
 # arr = [random.randint(0, 5000) for _ in range(100)]
 merge_sort(arr, 0, len(arr))
-arr.sort()
 print("\n".join(map(str, arr)))
