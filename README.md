@@ -1,3 +1,7 @@
-# 보는 책 리스트
+### 백준 온라인 저지
 
--   Data Structures and Algorithms in Python
+https://www.acmicpc.net/user/greedy0110
+
+### leetcode
+
+https://leetcode.com/greedy0110/
