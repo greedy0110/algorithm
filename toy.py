@@ -4,6 +4,6 @@ import sys
 def input(): return sys.stdin.readline().strip()
 
 
-A, B = input().split()
+arr = [1, 2, 3]
 
-print(max(int(A[::-1]), int(B[::-1])))
+print(arr[1:3])

@@ -75,4 +75,4 @@ for _ in range(C):
 
             return ret
 
-    print(max(getMaxLeafToLeaf(tree), heights(tree)))
+    print(max(getMaxLeafToLeaf(tree), heights[0]))
