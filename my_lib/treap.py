@@ -8,88 +8,141 @@
 import random
 
 
-class Treap:
+class Node:
     def __init__(self, key) -> None:
-        self._key = key
-        self._left = None
-        self._right = None
-        self._priority = random.randint(0, 10000)  # 난수화된 우선순위를 매긴다.
+        self.key = key
+        self.left = None
+        self.right = None
+        self.priority = random.randint(0, 10000)  # 난수화된 우선순위를 매긴다.
 
-    def insert_node(self, new_node):
-        # 우선순위를 비교한다.
-        if self._priority >= new_node._priority:
-            # 루트 보다 작다면? key를 비교해서 왼쪽에, 오른쪽에 둘지 결정한다.
-            if self._key >= new_node._key:
-                if not self._left:
-                    self._left = new_node
-                else:
-                    self._left.insert_node(new_node)
-            else:
-                if not self._right:
-                    self._right = new_node
-                else:
-                    self._right.insert_node(new_node)
+    def copy_node_value(self, new_node):
+        self.key = new_node.key
+        self.priority = new_node.priority
+
+
+def treap_insert(root, key):
+    return insert_node(root, Node(key))
+
+
+def insert_node(root, new_node):
+    if root is None:
+        root = new_node
+        return root
+
+    # 우선순위를 비교한다.
+    if root.priority >= new_node.priority:
+        # 루트 보다 작다면? key를 비교해서 왼쪽에, 오른쪽에 둘지 결정한다.
+        if root.key >= new_node.key:
+            root.left = insert_node(root.left, new_node)
         else:
-            # 루트 보다 크다면? 루트의 위치에 새 노드가 들어가야 한다. 재배치가 필요하다.
-            # 루트를 새 노드의 key를 기준으로 작은 트리, 큰 트리로 쪼갠다.
-            left_treap, right_treap = self.split(new_node._key)
+            root.right = insert_node(root.right, new_node)
+    else:
+        # 루트 보다 크다면? 루트의 위치에 새 노드가 들어가야 한다. 재배치가 필요하다.
+        # 루트를 새 노드의 key를 기준으로 작은 트리, 큰 트리로 쪼갠다.
+        left_treap, right_treap = split(root, new_node.key)
 
-            # 루트를 새 노드로 대체한다.
-            self._key = new_node._key
-            self._priority = new_node._priority
+        # 루트를 새 노드로 대체한다.
+        root.copy_node_value(new_node)
 
-            # 루트의 left, right를 앞서 구한 작은 트리, 큰 트리로 대체한다.
-            self._left = left_treap
-            self._right = right_treap
+        # 루트의 left, right를 앞서 구한 작은 트리, 큰 트리로 대체한다.
+        root.left = left_treap
+        root.right = right_treap
 
-    def insert(self, key):
-        # 새 노드를 생성한다.
-        new_node = Treap(key)
+    # key를 추가한 트립의 root를 반환한다.
+    return root
 
-        return self.insert_node(new_node)
 
-    # return (key를 기준으로 작은 값), (key를 기준으로 큰 값)
-    def split(self, key):
-        dummy_root = Treap(self._key)
-        dummy_root._priority = self._priority
-        dummy_root._left = self._left
-        dummy_root._right = self._right
+def split(root, key):
+    # (key를 기준으로 작은 값, key를 기준으로 큰 값)을 반환한다.
+    if root is None:
+        return None, None
 
-        # key를 기준으로 작은 트립, 큰 트립을 나누고 반환 한다.
-        # key가 루트보다 크다면, right를 쪼갠 것
-        if key > self._key:  # 루트보다 큰 key
-            if not self._right:  # 쪼갤 key보다 큰 원소가 없다.
-                return dummy_root, None
-            else:
-                left_treap, right_treap = self._right.split(key)
-                dummy_root._right = left_treap
-                return dummy_root, right_treap
-        else:  # 루트보다 작은 key
-            if not self._left:  # 쪼갤 key보다 작은 원소가 없다.
-                return None, dummy_root
-            else:
-                left_treap, right_treap = self._left.split(key)
-                dummy_root._left = right_treap
-                return left_treap, dummy_root
+    new_root = Node(0)
+    new_root.copy_node_value(root)
+    new_root.left = root.left
+    new_root.right = root.right
 
-    def print_trace(self, depth=0):
-        if depth == 0:
-            print("----Print Treap")
-        print("{}[{} {}] depth: {}".format(
-            "**"*depth, self._key, self._priority, depth))
-        if self._left:
-            self._left.print_trace(depth+1)
-        if self._right:
-            self._right.print_trace(depth+1)
-        if depth == 0:
-            print("----")
+    # key를 기준으로 작은 트립, 큰 트립을 나누고 반환 한다.
+    # key가 루트보다 크다면, right를 쪼갠 것
+    if key > root.key:  # 루트보다 큰 key
+        left_treap, right_treap = split(root.right, key)
+        new_root.right = left_treap
+        return new_root, right_treap
+    else:  # 루트보다 작은 key
+        left_treap, right_treap = split(root.left, key)
+        new_root.left = right_treap
+        return left_treap, new_root
+
+
+def treap_delete(root, key):
+    if root is None:
+        return root
+
+    if key > root.key:
+        root.right = treap_delete(root.right, key)
+    elif key < root.key:
+        root.left = treap_delete(root.left, key)
+    else:  # 해당 root가 삭제 대상이다.
+        if root.left is None and root.right is None:  # leaf node이다. 그냥 삭제하자.
+            del root
+            return None
+        elif root.left is None:  # 자식이 하나이면, 자식을 root에 카피한다.
+            new_root = root.right
+            del root
+            return new_root
+        elif root.right is None:  # 자식이 하나이면, 자식을 root에 카피한다.
+            new_root = root.left
+            del root
+            return new_root
+        else:  # 자식이 두 개면, 재배치가 필요하다.
+            new_root = del_merge(root.left, root.right)
+            del root
+            return new_root
+
+    # key를 삭제한 트립의 root를 반환한다.
+    return root
+
+
+def del_merge(left, right):
+    if left is None:
+        return right
+    if right is None:
+        return left
+
+    # root노드를 제거할 때, left, right 기준
+    assert(left.key < right.key)
+
+    if left.priority < right.priority:
+        right.left = del_merge(left, right.left)
+        return right
+    else:
+        left.right = del_merge(left.right, right)
+        return left
+
+
+def print_trace(root, depth=0):
+    if root is None:
+        return
+
+    if depth == 0:
+        print("----Print Treap")
+    print("{}[{} {}] depth: {}".format(
+        "**"*depth, root.key, root.priority, depth))
+    print_trace(root.left, depth+1)
+    print_trace(root.right, depth+1)
+    if depth == 0:
+        print("----")
 
 
 if __name__ == "__main__":
-    root = Treap(10)
+    root = Node(10)
 
-    arr = [i for i in range(10000)]
+    arr = [1, 2, 3, 4]
     for v in arr:
-        root.insert(v)
+        root = treap_insert(root, v)
 
-    root.print_trace()
+    print_trace(root)
+
+    for v in [1, 2, 4]:
+        root = treap_delete(root, v)
+        print_trace(root)
