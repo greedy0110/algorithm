@@ -8,10 +8,10 @@
 
 using namespace std;
 
-typedef long long int lli;
+typedef long long int ll;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
-typedef vector<lli> vlli;
+typedef vector<ll> vlli;
 
 int N, K;
 vvi cache = vvi(201, vi(201, -1));

@@ -4,9 +4,9 @@
 
 using namespace std;
 
-typedef long long int lli;
+typedef long long int ll;
 typedef vector<int> vi;
-typedef vector<lli> vlli;
+typedef vector<ll> vlli;
 
 vi cache;
 

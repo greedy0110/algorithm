@@ -4,17 +4,17 @@
 
 using namespace std;
 
-typedef long long int lli;
+typedef long long int ll;
 typedef vector<int> vi;
-typedef vector<lli> vlli;
+typedef vector<ll> vlli;
 
 vlli cache = vlli(1001);
 
-lli count(int n) {
+ll count(int n) {
     if (n == 1) return 1;
     if (n == 2) return 3;
 
-    lli &ans = cache[n];
+    ll &ans = cache[n];
 
     if (ans != -1) return ans;
 
