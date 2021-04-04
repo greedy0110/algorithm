@@ -151,6 +151,35 @@ def nerd_delete(root, ip, iq):
         return root
 
 
+def tree_maxinum(root):
+    while root.right is not None:
+        root = root.right
+    return root
+
+
+def predecessor(root, x):
+    if x is None:
+        return x
+    if x.left is not None:
+        return tree_maxinum(x.left)
+    y = parent(root, x)
+    while y is not None and x == y.left:
+        x = y
+        y = y.parent
+    return y
+
+
+def parent(root, x):
+    parent = None
+    while root.key != x.key:
+        parent = root
+        if root.key > x.key:
+            root = root.left
+        else:
+            root = root.right
+    return parent
+
+
 def simple_size(root):
     if root is None:
         return 0
@@ -177,7 +206,15 @@ for _ in range(C):
             continue
 
         # 입력된 ip 보다 작은 key에 대해서 iq가 q보다 크면, 작은 key 값은 제거한다.
-        root = nerd_delete(root, ip, iq)
+        # ip_next_node의 predecessor를 찾아야 한다.
+        pre = predecessor(root, ip_next_node)
+        delete_list = []
+        while pre is not None and pre.value <= iq:
+            delete_list.append(pre.key)
+            pre = predecessor(root, pre)
+
+        for v in delete_list:
+            treap_delete(root, v)
 
         root = treap_insert(root, ip, iq)
         # BST의 값 총 수를 반환한다.

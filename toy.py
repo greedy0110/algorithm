@@ -1,9 +1,4 @@
-import sys
+a = {1: 2, 3: 4, 2: 1}
 
-
-def input(): return sys.stdin.readline().strip()
-
-
-arr = [1, 2, 3]
-
-print(arr[1:3])
+for i, v in a.fromkeys():
+    print(i, v)

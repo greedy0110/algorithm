@@ -42,10 +42,6 @@ void topology_sort() {
     }
 }
 
-bool sccs_sort(vi i, vi j) {
-    return i[0] < j[0];
-}
-
 void scc() {
 // Gt에 대한 dfs 수행, topology 리스트 순서대로 방문
     visited = vector<bool>(V, false);
