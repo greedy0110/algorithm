@@ -29,36 +29,31 @@ typedef vector<ll> vll;
 typedef vector<pii> vpii;
 typedef vector<vpii> vvpii;
 typedef priority_queue<int, vi, greater<>> mq;
+typedef priority_queue<pii, vpii, greater<>> mpq;
 
 vvpii wG;
 int V, E, K;
 vi dist;
-si Q;
 
 void dijkstra(int src) {
     dist = vi(V + 1, BIG);
-    Q.clear();
-    for (int i = 1; i <= V; i++) Q.insert(i);
+    mpq pq;
 
     dist[src] = 0;
+    pq.push(make_pair(0, src));
 
-    while (!Q.empty()) {
-        int v;
-        int min_dist = BIG + 1;
-        for (auto &i : Q) {
-            if (dist[i] < min_dist) {
-                v = i;
-                min_dist = dist[i];
-            }
-        }
-
-        Q.erase(v);
+    while (!pq.empty()) {
+        int v = pq.top().se;
+        pq.pop();
 
         for (int i = 0; i < wG[v].size(); i++) {
             int u = wG[v][i].fi;
             int w = wG[v][i].se;
 
-            if (dist[v] + w < dist[u]) dist[u] = dist[v] + w;
+            if (dist[v] + w < dist[u]) {
+                dist[u] = dist[v] + w;
+                pq.push(make_pair(dist[u], u));
+            }
         }
     }
 }
