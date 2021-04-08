@@ -49,9 +49,8 @@ int main() {
     return 0;
 }
 
-int cache[1001][1001][2];
 char board[1001][1001];
-bool visited[1001][1001];
+bool visited[1001][1001][2];
 int N, M;
 int dx[] = {1, -1, 0, 0};
 int dy[] = {0, 0, 1, -1};
@@ -60,54 +59,76 @@ bool in_board(int x, int y) {
     return 1 <= x && x <= N && 1 <= y && y <= M;
 }
 
-int p(int x, int y, int z) {
-    if (x == N && y == M) return 1;
+class Factor {
+public:
+    int x;
+    int y;
+    int dist;
+    int hammer;
+};
 
-    int &ans = cache[x][y][z];
+void p_bfs() {
+    queue<Factor> q;
 
-    if (ans != -1) return ans;
+    Factor st{1, 1, 1, 1};
+    visited[1][1][1] = true;
 
-    int ret = BIG;
+    q.push(st);
 
-    for (int i = 0; i < 4; i++) {
-        int nx = x + dx[i];
-        int ny = y + dy[i];
+    vi ans;
+    while (!q.empty()) {
+        Factor cur = q.front();
+        q.pop();
 
-        if (!in_board(nx, ny)) continue;
-        if (visited[nx][ny]) continue;
+        int x = cur.x;
+        int y = cur.y;
+        int dist = cur.dist;
+        int hammer = cur.hammer;
 
-        if (board[nx][ny] == '0') {
-            visited[nx][ny] = true;
-            ret = min(ret, 1 + p(nx, ny, z));
-            visited[nx][ny] = false;
-        } else if (z == 1) {
-            visited[nx][ny] = true;
-            ret = min(ret, 1 + p(nx, ny, z - 1));
-            visited[nx][ny] = false;
+        if (x == N && y == M) {
+            ans.push_back(dist);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+
+            if (!in_board(nx, ny)) continue;
+            if (visited[nx][ny][hammer]) continue;
+
+            if (board[nx][ny] == '0') {
+                Factor next{nx, ny, dist + 1, hammer};
+                visited[nx][ny][hammer] = true;
+                q.push(next);
+            } else if (hammer >= 1) {
+                Factor next{nx, ny, dist + 1, hammer - 1};
+                visited[nx][ny][hammer - 1] = true;
+                q.push(next);
+            }
         }
     }
 
-    return ans = ret;
+    if (ans.empty()) {
+        cout << -1 << endl;
+    } else {
+        auto ret_iter = min_element(all(ans));
+        cout << *ret_iter << endl;
+    }
 }
 
 void solve() {
-//    cin >> N >> M;
-    N = M = 1000;
+    cin >> N >> M;
     for (int i = 1; i <= N; i++) {
         char row[M];
-//        cin >> row;
+        cin >> row;
         for (int j = 1; j <= M; j++) {
-            cache[i][j][0] = -1;
-            cache[i][j][1] = -1;
-            visited[i][j] = false;
-//            board[i][j] = row[j - 1];
-            board[i][j] = '0';
+            visited[i][j][0] = false;
+            visited[i][j][1] = false;
+            board[i][j] = row[j - 1];
         }
     }
 
-    visited[1][1] = true;
-    int ans = p(1, 1, 1);
-    cout << ((ans == BIG) ? -1 : ans) << endl;
+    p_bfs();
 }
 
 // 재귀 알고리즘을 짜는 경우, 재귀 depth 를 알아볼 것...
