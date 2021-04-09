@@ -49,67 +49,55 @@ int main() {
 }
 
 char str[1000001];
-char boom[37];
+string boom;
+
+class BoomStack {
+public:
+    char arr[1000001];
+    string boom;
+    int top = 0;
+
+    void push(char s) {
+        arr[top++] = s;
+
+        if (boom.size() <= top) {
+            bool trigger = true;
+            for (int i = 0; i < boom.size(); i++) {
+                if (boom[i] != arr[top - boom.size() + i]) {
+                    trigger = false;
+                    break;
+                }
+            }
+
+            if (trigger) {
+                top -= boom.size();
+            }
+        }
+    }
+
+    bool empty() {
+        return top == 0;
+    }
+};
 
 void solve() {
     cin >> str >> boom;
 
-    int boom_len = strlen(boom);
+    BoomStack stack;
+
+    stack.boom = boom;
+
     int str_len = strlen(str);
 
-    while (true) {
-        vi booms;
-
-        for (int i = 0; i < str_len - boom_len + 1; i++) {
-            if (str[i] == boom[0]) {
-                bool trigger = true;
-
-                int j;
-                for (j = 1; j < boom_len; j++) {
-                    if (str[i + j] != boom[j]) {
-                        trigger = false;
-                        break;
-                    }
-                }
-
-                if (trigger) booms.push_back(i);
-            }
-        }
-
-        if (booms.empty()) break;
-
-        int prev_boom = booms[0];
-        int k = 0;
-
-        for (int j = 0; j < prev_boom; j++) {
-            str[k] = str[j];
-            k++;
-        }
-
-        for (int i = 1; i < booms.size(); i++) {
-            int boom_index = booms[i];
-
-            for (int j = prev_boom + boom_len; j < boom_index; j++) {
-                str[k] = str[j];
-                k++;
-            }
-
-            prev_boom = boom_index;
-        }
-
-        for (int i = prev_boom + boom_len; i < str_len; i++) {
-            str[k] = str[i];
-            k++;
-        }
-
-        str_len -= booms.size() * boom_len;
+    for (int i = 0; i < str_len; i++) {
+        stack.push(str[i]);
     }
 
-    if (str_len <= 0) {
-        printf("FRULA\n");
+    if (stack.empty()) {
+        cout << "FRULA" << endl;
     } else {
-        for (int i = 0; i < str_len; i++) {
-            printf("%c", str[i]);
+        for (int i = 0; i < stack.top; i++) {
+            printf("%c", stack.arr[i]);
         }
         printf("\n");
     }
