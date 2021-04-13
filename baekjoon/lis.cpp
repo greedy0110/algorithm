@@ -46,6 +46,9 @@ vi arr;
 // cache[x]는, arr[x]를 포함한, lis 의 최대를 반환.
 vi cache;
 
+// x 다음에 갈 길. -1 이면 길이 없음을 의미한다.
+vi next_to;
+
 // sp를 포함한, lis 길이의 최대를 반환
 int lis(int sp) {
     int &memo = cache[sp];
@@ -54,7 +57,11 @@ int lis(int sp) {
     int ans = 1;
     for (int i = sp + 1; i < N; i++) {
         if (arr[i] > arr[sp]) {
-            ans = max(ans, lis(i) + 1);
+            int s_ans = lis(i) + 1;
+            if (s_ans > ans) {
+                ans = s_ans;
+                next_to[sp] = i;
+            }
         }
     }
 
@@ -65,15 +72,28 @@ void solve() {
     cin >> N;
     arr = vi(N);
     cache = vi(N, -1);
+    next_to = vi(N, -1);
 
     repeat(i, N) {
         cin >> arr[i];
     }
 
-    int ans = 1;
+    int ans = -1;
+    int sp;
     repeat(i, N) {
-        ans = max(ans, lis(i));
+        int s_ans = lis(i);
+        if (ans < s_ans) {
+            ans = s_ans;
+            sp = i;
+        }
     }
 
     cout << ans << endl;
+    cout << arr[sp] << " ";
+    int route = next_to[sp];
+    while (route != -1) {
+        cout << arr[route] << " ";
+        route = next_to[route];
+    }
+    cout << endl;
 }
