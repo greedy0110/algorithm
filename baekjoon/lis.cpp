@@ -43,57 +43,51 @@ int main() {
 int N;
 vi arr;
 
-// cache[x]는, arr[x]를 포함한, lis 의 최대를 반환.
-vi cache;
+// dp[i] 는 arr[i] 를 마지막 요소로 하는 lis 의 길이
+vi dp;
 
-// x 다음에 갈 길. -1 이면 길이 없음을 의미한다.
-vi next_to;
-
-// sp를 포함한, lis 길이의 최대를 반환
-int lis(int sp) {
-    int &memo = cache[sp];
-    if (memo != -1) return memo;
-
-    int ans = 1;
-    for (int i = sp + 1; i < N; i++) {
-        if (arr[i] > arr[sp]) {
-            int s_ans = lis(i) + 1;
-            if (s_ans > ans) {
-                ans = s_ans;
-                next_to[sp] = i;
-            }
-        }
-    }
-
-    return memo = ans;
-}
+// prev_index[i] 는 arr[i] 이전의 lis 요소, -1 prev 가 없음.
+vi prev_index;
 
 void solve() {
     cin >> N;
     arr = vi(N);
-    cache = vi(N, -1);
-    next_to = vi(N, -1);
+    dp = vi(N, 1);
+    prev_index = vi(N, -1);
 
     repeat(i, N) {
         cin >> arr[i];
     }
 
-    int ans = -1;
-    int sp;
-    repeat(i, N) {
-        int s_ans = lis(i);
-        if (ans < s_ans) {
-            ans = s_ans;
-            sp = i;
+    for (int i = 0; i < N; i++) {
+        // dp[0..i-1] 까지는 valid 한 값이 들어있다.
+        dp[i] = 1;
+        for (int j = i - 1; j >= 0; j--) {
+            if (arr[j] < arr[i] && dp[j] + 1 > dp[i]) {
+                // arr[i] 보다 작은 arr[j] 를 찾으면
+                // dp[j] 에 해당하는 lis 에 arr[i] 를 추가할 수 있다.
+                dp[i] = dp[j] + 1;
+                prev_index[i] = j;
+            }
         }
     }
 
-    cout << ans << endl;
-    cout << arr[sp] << " ";
-    int route = next_to[sp];
+    auto iter = max_element(all(dp));
+    int index = distance(dp.begin(), iter);
+
+    cout << *iter << endl;
+
+    vi r;
+    r.push_back(arr[index]);
+
+    int route = prev_index[index];
     while (route != -1) {
-        cout << arr[route] << " ";
-        route = next_to[route];
+        r.push_back(arr[route]);
+        route = prev_index[route];
+    }
+
+    for (int i = r.size() - 1; i >= 0; i--) {
+        cout << r[i] << " ";
     }
     cout << endl;
 }
