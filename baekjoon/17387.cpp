@@ -40,61 +40,75 @@ int main() {
     return 0;
 }
 
+// 0 -> 평행
+// 1 -> 반시계
+// -1 -> 시계
+int ccw(pair<ll, ll> a, pair<ll, ll> b, pair<ll, ll> c) {
+    ll op = (b.first - a.first) * (c.second - a.second) - (b.second - a.second) * (c.first - a.first);
+
+    if (op == 0) return 0;
+    else if (op > 0) return 1;
+    else return -1;
+}
+
 void solve() {
     ll x1, x2, x3, x4, y1, y2, y3, y4;
     cin >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4;
 
     if (x1 > x2) {
-        ll temp = x1;
-        x1 = x2;
-        x2 = temp;
-        temp = y1;
-        y1 = y2;
-        y2 = temp;
+        swap(x1, x2);
+        swap(y1, y2);
     }
 
     if (x3 > x4) {
-        ll temp = x3;
-        x3 = x4;
-        x4 = temp;
-        temp = y3;
-        y3 = y4;
-        y4 = temp;
+        swap(x3, x4);
+        swap(y3, y4);
     }
     assert(x1 <= x2 && x3 <= x4);
 
     bool px1 = x1 == x2;
     bool px2 = x3 == x4;
 
-    if (px1) {
-        cout << ((x3 <= x1 && x1 <= x4) ? 1 : 0) << endl;
+    if (px1 && px2) {
+        if (x1 != x3) {
+            cout << 0 << endl;
+            return;
+        }
+
+        if (y1 > y2) swap(y1, y2);
+        if (y3 > y4) swap(y3, y4);
+
+        bool mutual = y2 < y3 || y4 < y1;
+
+        cout << (mutual ? 0 : 1) << endl;
         return;
     }
 
-    if (px2) {
-        cout << ((x1 <= x3 && x3 <= x2) ? 1 : 0) << endl;
+    bool py1 = y1 == y2;
+    bool py2 = y3 == y4;
+
+    if (py1 && py2) {
+        if (y1 != y3) {
+            cout << 0 << endl;
+            return;
+        }
+
+        if (x1 > x2) swap(x1, x2);
+        if (x3 > x4) swap(x3, x4);
+
+        bool mutual = x2 < x3 || x4 < x1;
+
+        cout << (mutual ? 0 : 1) << endl;
         return;
     }
-    assert(x1 != x2 && x3 != x4);
 
-    ll xs = x1 - x2;
-    ll xf = x3 - x4;
+    pair<ll, ll> p1 = make_pair(x1, y1);
+    pair<ll, ll> p2 = make_pair(x2, y2);
+    pair<ll, ll> p3 = make_pair(x3, y3);
+    pair<ll, ll> p4 = make_pair(x4, y4);
 
-    if ((y1 - y2) * (x3 - x4) == (y3 - y4) * (x1 - x2)) {
-        bool not_interact = x2 < x3 || x4 < x1;
-        bool same_y_inter = xs * xf * y1 - x1 * xf * (y1 - y2) == xs * xf * y3 - x3 * xs * (y3 - y4);
+    int ins_f1 = ccw(p3, p4, p1) * ccw(p3, p4, p2);
+    int ins_f2 = ccw(p1, p2, p3) * ccw(p1, p2, p4);
 
-        cout << ((same_y_inter && !not_interact) ? 1 : 0) << endl;
-        return;
-    }
-
-    ll X = xf * (y1 - y2) - xs * (y3 - y4);
-    ll Xa = xs * xf * (y3 - y1) - xs * (y3 - y4) * x3 + xf * (y1 - y2) * x1;
-
-    bool intersect = X * x1 <= Xa && Xa <= X * x2 && X * x3 <= Xa && Xa <= X * x4;
-    if (X < 0) {
-        intersect = X * x1 >= Xa && Xa >= X * x2 && X * x3 >= Xa && Xa >= X * x4;
-    }
-
-    cout << (intersect ? 1 : 0) << endl;
+    cout << ((ins_f1 <= 0 && ins_f2 <= 0) ? 1 : 0) << endl;
 }
