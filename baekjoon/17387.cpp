@@ -55,41 +55,24 @@ void solve() {
     ll x1, x2, x3, x4, y1, y2, y3, y4;
     cin >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4;
 
-    if (x1 > x2) {
-        swap(x1, x2);
-        swap(y1, y2);
-    }
+    pair<ll, ll> p1 = make_pair(x1, y1);
+    pair<ll, ll> p2 = make_pair(x2, y2);
+    pair<ll, ll> p3 = make_pair(x3, y3);
+    pair<ll, ll> p4 = make_pair(x4, y4);
 
-    if (x3 > x4) {
-        swap(x3, x4);
-        swap(y3, y4);
-    }
-    assert(x1 <= x2 && x3 <= x4);
+    int ins_f1 = ccw(p3, p4, p1) * ccw(p3, p4, p2);
+    int ins_f2 = ccw(p1, p2, p3) * ccw(p1, p2, p4);
 
-    bool px1 = x1 == x2;
-    bool px2 = x3 == x4;
+    if (ins_f1 == 0 && ins_f2 == 0) {
+        // 4 점이 일직선 상에 있을 때 에러 처리
+        if (x1 == x2) {
+            // x = y1 형태의 직선의 평행 
+            if (y1 > y2) swap(y1, y2);
+            if (y3 > y4) swap(y3, y4);
 
-    if (px1 && px2) {
-        if (x1 != x3) {
-            cout << 0 << endl;
-            return;
-        }
+            bool mutual = y2 < y3 || y4 < y1;
 
-        if (y1 > y2) swap(y1, y2);
-        if (y3 > y4) swap(y3, y4);
-
-        bool mutual = y2 < y3 || y4 < y1;
-
-        cout << (mutual ? 0 : 1) << endl;
-        return;
-    }
-
-    bool py1 = y1 == y2;
-    bool py2 = y3 == y4;
-
-    if (py1 && py2) {
-        if (y1 != y3) {
-            cout << 0 << endl;
+            cout << (mutual ? 0 : 1) << endl;
             return;
         }
 
@@ -101,14 +84,6 @@ void solve() {
         cout << (mutual ? 0 : 1) << endl;
         return;
     }
-
-    pair<ll, ll> p1 = make_pair(x1, y1);
-    pair<ll, ll> p2 = make_pair(x2, y2);
-    pair<ll, ll> p3 = make_pair(x3, y3);
-    pair<ll, ll> p4 = make_pair(x4, y4);
-
-    int ins_f1 = ccw(p3, p4, p1) * ccw(p3, p4, p2);
-    int ins_f2 = ccw(p1, p2, p3) * ccw(p1, p2, p4);
 
     cout << ((ins_f1 <= 0 && ins_f2 <= 0) ? 1 : 0) << endl;
 }
