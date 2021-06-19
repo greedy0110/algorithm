@@ -1,0 +1,90 @@
+//
+// Created by 신승민 on 2021/06/19.
+//
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define all(X) begin((X)), end((X))
+#define endl '\n'
+#define sz(X) (int)(X).size()
+#define fi first
+#define se second
+#define fv(X) for(auto&_:(X))cin>>_
+#define fv2(X) for(auto&_1:(X))for(auto&_2:_1)cin>>_2
+#define repeat(i, X) for (int i=0; i<((X)); i++)
+#define SUPER_BIG numeric_limits<double>::max()
+
+typedef long long ll;
+typedef vector<int> vi;
+typedef vector<char> vc;
+typedef pair<int, int> pii;
+typedef set<int> si;
+typedef vector<vi> vvi;
+typedef vector<vc> vvc;
+typedef vector<bool> vb;
+typedef vector<ll> vll;
+typedef vector<pii> vpii;
+typedef vector<vpii> vvpii;
+typedef vector<string> vs;
+typedef priority_queue<int, vi, greater<>> mq;
+typedef priority_queue<pii, vpii, greater<>> mpq;
+
+void solve();
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    solve();
+    return 0;
+}
+
+vi P;
+
+void get_P(int n) {
+    vb isP = vb(n + 1, true);
+    isP[0] = false;
+    isP[1] = false;
+
+    for (int i = 2; i * i <= n; i++) {
+        if (!isP[i]) continue;
+
+        for (int j = i + i; j <= n; j += i) {
+            isP[j] = false;
+        }
+    }
+
+    for (int i = 2; i <= n; i++) {
+        if (isP[i]) P.push_back(i);
+    }
+}
+
+void solve() {
+    int N;
+    scanf("%d", &N);
+
+    get_P(N);
+    int M = P.size();
+    if (M == 0) {
+        printf("0\n");
+        return;
+    }
+
+    vll S = vll(M);
+    S[0] = P[0];
+    for (int i = 1; i < M; i++) {
+        S[i] = S[i - 1] + P[i];
+    }
+
+    int ans = 0;
+
+    ans += (*lower_bound(all(S), N) == N) ? 1 : 0;
+
+    for (int i = 1; i < M; i++) {
+        ans += (*lower_bound(all(S), N + S[i - 1]) == N + S[i - 1]) ? 1 : 0;
+    }
+
+    printf("%d\n", ans);
+}
