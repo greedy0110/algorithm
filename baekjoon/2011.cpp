@@ -8,41 +8,24 @@ using namespace std;
 
 const int MOD = 1000000;
 string input;
-int cache[5001] = {};
-
-bool isPossible1(int p) {
-    return input[p] != '0';
-}
-
-bool isPossible2(int p) {
-    if (int(input.size()) - 2 >= p) {
-        assert(p <= input.length() - 2);
-        int f = input[p] - '0';
-        int s = input[p + 1] - '0';
-        return 10 * f + s <= 26;
-    }
-    return false;
-}
-
-int numP(int p) {
-    if (p >= input.size()) return 1;
-
-    int &cac = cache[p];
-    if (cac != 0) return cac;
-
-    int ans = 0;
-    if (isPossible1(p)) {
-        ans += numP(p + 1);
-        if (isPossible2(p)) ans += numP(p + 2);
-    }
-
-    return cac = ans % MOD;
-}
 
 int main() {
     cin >> input;
 
-    cout << numP(0);
+    int dp[5002] = {};
+
+    dp[0] = 1;
+    dp[1] = input[0] != '0' ? 1 : 0;
+    for (int i = 2; i <= input.size(); i++) {
+        int a = input[i - 2] - '0';
+        int b = input[i - 1] - '0';
+
+        if (b != 0) dp[i] += dp[i - 1];
+        if (a != 0 && a * 10 + b <= 26) dp[i] += dp[i - 2];
+        dp[i] %= MOD;
+    }
+
+    cout << dp[input.size()] << endl;
 
     return 0;
 }
