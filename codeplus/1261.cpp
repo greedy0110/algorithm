@@ -10,12 +10,6 @@ using namespace std;
 #define all(X) begin((X)), end((X))
 #define endl '\n'
 
-struct Node {
-    int x;
-    int y;
-    int drill;
-};
-
 int dx[] = {1, 0, -1, 0};
 int dy[] = {0, 1, 0, -1};
 
