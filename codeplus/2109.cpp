@@ -20,31 +20,24 @@ int main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
+    const int MAX_DAY = 10000;
     int N;
     cin >> N;
-    vvi P(10000);
-    RP(_, N) {
+    vvi lectures(MAX_DAY + 1);
+    RP(i, N) {
         int p, d;
         cin >> p >> d;
-        d--;
-        P[d].push_back(p);
+        lectures[d].push_back(p);
     }
 
-    RP(i, 10000) {
-        sort(all(P[i]), [&](int a, int b) {
-            return a > b;
-        });
-    }
-
+    priority_queue<int> pq;
     int ans = 0;
-    for (int now = 0; now < 10000; now++) {
-        int temp = 0;
-        if (!P[now].empty()) temp = P[now][0];
-        for (int i = 1; now + i < 10000; i++) {
-            if (P[now + i].size() <= i) continue;
-            temp = max(temp, P[now + i][i]);
+    for (int day = MAX_DAY; day >= 1; day--) {
+        for (int p : lectures[day]) pq.push(p);
+        if (!pq.empty()) {
+            ans += pq.top();
+            pq.pop();
         }
-        ans += temp;
     }
 
     cout << ans << endl;
