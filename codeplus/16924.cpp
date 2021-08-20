@@ -23,6 +23,7 @@ int main() {
 
     vi cs;
     char A[101][101];
+    char B[101][101];
     int N, M;
     cin >> N >> M;
     RP(x, N) {
@@ -30,6 +31,7 @@ int main() {
         cin >> temp;
         RP(y, M) {
             A[x + 1][y + 1] = temp[y];
+            B[x + 1][y + 1] = '.';
         }
     }
 
@@ -48,11 +50,27 @@ int main() {
                 for (int sm = x; sm < x + size; sm++) {
                     for (int sy = y; sy < y + size; sy++) {
                         if ((sm == x + m || sy == y + m) && A[sm][sy] == '.') ok = false;
-                        if (sm != x + m && sy != y + m && A[sm][sy] == '*') ok = false;
                     }
                     if (!ok) break;
                 }
-                if (ok) ans.push_back({x + m, y + m, i});
+                if (ok) {
+                    ans.push_back({x + m, y + m, i});
+                    for (int sy = y; sy < y + size; sy++) {
+                        B[x + m][sy] = '*';
+                    }
+                    for (int sm = x; sm < x + size; sm++) {
+                        B[sm][y + m] = '*';
+                    }
+                }
+            }
+        }
+    }
+
+    for (int x = 1; x <= N; x++) {
+        for (int y = 1; y <= M; y++) {
+            if (A[x][y] != B[x][y]) {
+                cout << -1 << endl;
+                return 0;
             }
         }
     }
