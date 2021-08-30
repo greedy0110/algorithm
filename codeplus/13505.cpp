@@ -20,12 +20,11 @@ const int MAX_SIZE = 32;
 
 class Trie {
     struct Node {
-        int children[2];
+        vi children;
         int cnt;
 
         Node() {
-            children[0] = -1;
-            children[1] = -1;
+            children = vi(2, -1);
             cnt = 0;
         };
     };
