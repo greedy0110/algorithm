@@ -33,20 +33,25 @@ int main() {
 
     string s;
     cin >> s;
+    int n = s.size();
     auto fail = find_fail(s);
-    vi cnt(s.size() + 1, 0);
-    cnt[s.size()] = 1;
-    for (int i = 0; i < s.size(); i++) {
-        // len 인 것이 몇 개 나왔나?
+    vi cnt(n + 1, 0);
+
+    cnt[n] = 1; // 전체 문자열을 하나 추가하자.
+    for (int i = 0; i < n; i++) {
         cnt[fail[i]]++;
     }
+    for (int i = n; i > 0; i--) {
+        cnt[fail[i - 1]] += cnt[i];
+    }
+    vector<pair<int, int>> ans;
+    for (int i = n; i > 0; i = fail[i - 1])
+        ans.push_back({i, cnt[i]});
 
-    // 작은 건, 큰 것에서 이미 반복해서 나왔을 것이다. 가산할 수있다.
-
-
-
-    for (int i = s.size(); i != 0; i = fail[i - 1]) {
-        cout << i << " " << cnt[i] << endl;
+    reverse(all(ans));
+    cout << ans.size() << endl;
+    for (auto &a : ans) {
+        cout << a.first << " " << a.second << endl;
     }
 
     return 0;
