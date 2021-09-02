@@ -38,85 +38,81 @@ typedef vector<string> vs;
 typedef priority_queue<int, vi, greater<>> mq;
 typedef priority_queue<pii, vpii, greater<>> mpq;
 
-void solve();
+int N, M;
+int S, E;
+vvpii G;
+vi parent;
+
+int dijkstra() {
+    // 최소 힙을 만든다.
+    priority_queue<pii, vpii, greater<>> q;
+    vi dist(N, 1e9);
+    vb visited(N, false);
+    parent = vi(N);
+    for (int i = 0; i < N; i++) parent[i] = i;
+
+    dist[S] = 0;
+    q.push({0, S});
+
+    while (!q.empty()) {
+        int cd = q.top().first;
+        int u = q.top().second;
+        q.pop();
+
+        if (visited[u]) continue;
+        visited[u] = true;
+
+        for (auto &p : G[u]) {
+            int v = p.first;
+            int c = p.second;
+
+            if (dist[v] > cd + c) {
+                dist[v] = cd + c;
+                parent[v] = u;
+                q.push({dist[v], v});
+            }
+        }
+    }
+
+    return dist[E];
+}
+
+vi find_route(int u) {
+    if (parent[u] == u) {
+        vi ans;
+        ans.push_back(u);
+        return ans;
+    }
+    vi ans = find_route(parent[u]);
+    ans.push_back(u);
+    return ans;
+}
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     cout.tie(NULL);
-    solve();
-    return 0;
-}
 
-vvpii wG;
-int N, M;
-vll dist;
-vi route;
-
-void dijkstra(int src) {
-    dist = vll(N + 1, SUPER_BIG);
-    route = vi(N + 1, -1);
-
-    priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<>> min_q;
-
-    dist[src] = 0;
-
-    min_q.push(make_pair(0, src));
-
-    while (!min_q.empty()) {
-        auto value = min_q.top();
-        min_q.pop();
-
-        int d = value.first;
-        int u = value.second;
-
-        for (int i = 0; i < wG[u].size(); i++) {
-            int v = wG[u][i].first;
-            int w = wG[u][i].second;
-
-            if (d + w < dist[v]) {
-                route[v] = u;
-                dist[v] = d + w;
-                min_q.push(make_pair(dist[v], v));
-            }
-        }
-    }
-}
-
-void solve() {
     cin >> N >> M;
-
-    wG = vvpii(N + 1);
-
-    repeat(_, M) {
-        int u, v, w;
-        cin >> u >> v >> w;
-
-        wG[u].push_back(make_pair(v, w));
+    G = vvpii(N);
+    for (int i = 0; i < M; i++) {
+        int a, b, c;
+        cin >> a >> b >> c;
+        a--;
+        b--;
+        G[a].push_back({b, c});
     }
+    cin >> S >> E;
+    S--;
+    E--;
 
-    int a, b;
-    cin >> a >> b;
+    int ans = dijkstra();
+    vi ans2 = find_route(E);
 
-    dijkstra(a);
-
-    cout << dist[b] << endl;
-
-    vi real_r;
-    real_r.push_back(b);
-
-    int r = route[b];
-
-    while (r != a) {
-        real_r.push_back(r);
-        r = route[r];
-    }
-
-    real_r.push_back(a);
-
-    cout << real_r.size() << endl;
-    for (int i = real_r.size() - 1; i >= 0; i--) {
-        cout << real_r[i] << " ";
-    }
+    cout << ans << endl;
+    cout << ans2.size() << endl;
+    for (int d : ans2) cout << d + 1 << " ";
     cout << endl;
+
+    return 0;
 }
