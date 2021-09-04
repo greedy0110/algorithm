@@ -16,6 +16,21 @@ typedef vector<bool> vb;
 typedef vector<vi> vvi;
 typedef long long ll;
 
+vi A, P;
+vvi cache;
+
+int go(int i, int j) {
+    if (i == j) return 0;
+    int &cac = cache[i][j];
+    if (cac != -1) return cac;
+
+    int ans = 1e9;
+    for (int k = i; k < j; k++) {
+        ans = min(ans, go(i, k) + go(k + 1, j) + P[k + 1] - P[i] + P[j + 1] - P[k + 1]);
+    }
+    return cac = ans;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
@@ -26,19 +41,15 @@ int main() {
     while (T--) {
         int N;
         cin >> N;
-        vi A(N), P(N); // P[i] -> A[i] 까지의 합.
+        A = vi(N);
+        cache = vvi(N, vi(N, -1));
+        RP(i, N) cin >> A[i];
+        P = vi(N + 1);
+        P[0] = 0;
         RP(i, N) {
-            cin >> A[i];
-            if (i == 0)P[i] = A[i];
-            else P[i] = P[i - 1] + A[i];
+            P[i + 1] = P[i] + A[i];
         }
-        vi dp(N);
-        dp[0] = A[0];
-        dp[1] = A[0] + A[1];
-        for (int i = 2; i < N; i++) {
-            dp[i] = min(dp[i - 1] + P[i - 1] + A[i], dp[i - 2] + P[i - 2] + 2 * (A[i - 1] + A[i]));
-        }
-        cout << dp[N - 1] << endl;
+        cout << go(0, N - 1) << endl;
     }
 
     return 0;
