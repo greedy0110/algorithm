@@ -42,31 +42,52 @@ public:
     }
 };
 
+struct Edges {
+    float w;
+    int u, v;
+
+    bool operator<(Edges &a) { return w < a.w; }
+};
+
+float sqr_dist(pair<float, float> &a, pair<float, float> &b) {
+    return (a.first - b.first) * (a.first - b.first) + (a.second - b.second) * (a.second - b.second);
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    int n, m;
-    cin >> n >> m;
-    vector<tuple<int, int, int>> edges;
-    RP(_, m) {
-        int a, b, c;
-        cin >> a >> b >> c;
-        edges.push_back({c, a - 1, b - 1});
+    int n;
+    cin >> n;
+    vector<pair<float, float>> pos;
+    RP(_, n) {
+        float a, b;
+        cin >> a >> b;
+        pos.push_back({a, b});
     }
-    sort(all(edges));
-    UnionFind uf(n);
-    int ans = 0;
-    for (auto &edge: edges) {
-        int c, u, v;
-        tie(c, u, v) = edge;
-        if (!uf.same(u, v)) {
-            uf.merge(u, v);
-            ans += c;
+
+    vector<Edges> es;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) continue;
+            float sqr = sqrt(sqr_dist(pos[i], pos[j]));
+            es.push_back({sqr, i, j});
         }
     }
-    cout << ans << endl;
+
+    sort(all(es));
+    UnionFind uf(n);
+
+    float mst = 0.0;
+    for (auto &e :es) {
+        if (!uf.same(e.v, e.u)) {
+            uf.merge(e.v, e.u);
+            mst += e.w;
+        }
+    }
+
+    cout << mst << endl;
 
     return 0;
 }

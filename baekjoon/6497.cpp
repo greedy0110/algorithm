@@ -42,31 +42,42 @@ public:
     }
 };
 
+struct Edges {
+    int w, u, v;
+
+    bool operator<(Edges &a) { return w < a.w; }
+};
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    int n, m;
-    cin >> n >> m;
-    vector<tuple<int, int, int>> edges;
-    RP(_, m) {
-        int a, b, c;
-        cin >> a >> b >> c;
-        edges.push_back({c, a - 1, b - 1});
-    }
-    sort(all(edges));
-    UnionFind uf(n);
-    int ans = 0;
-    for (auto &edge: edges) {
-        int c, u, v;
-        tie(c, u, v) = edge;
-        if (!uf.same(u, v)) {
-            uf.merge(u, v);
-            ans += c;
+    while (true) {
+        int m, n;
+        cin >> m >> n;
+        if (m == 0 && n == 0) break;
+        vector<Edges> edges;
+        int total = 0;
+        RP(_, n) {
+            int x, y, z;
+            cin >> x >> y >> z;
+            total += z;
+            edges.push_back({z, x, y});
         }
+
+        UnionFind uf(m);
+        sort(all(edges));
+        int mst = 0;
+        for (auto &edge: edges) {
+            if (!uf.same(edge.u, edge.v)) {
+                uf.merge(edge.u, edge.v);
+                mst += edge.w;
+            }
+        }
+
+        cout << total - mst << endl;
     }
-    cout << ans << endl;
 
     return 0;
 }
