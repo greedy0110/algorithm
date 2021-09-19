@@ -1,136 +1,69 @@
 //
-// Created by 신승민 on 2021/05/19.
+// Created by 신승민 on 2021/09/18.
 //
 
 #include <bits/stdc++.h>
 
 using namespace std;
 
+#define RP(i, X) for (int i=0; i<((X)); i++)
 #define all(X) begin((X)), end((X))
 #define endl '\n'
-#define sz(X) (int)(X).size()
-#define fi first
-#define se second
-#define fv(X) for(auto&_:(X))cin>>_
-#define fv2(X) for(auto&_1:(X))for(auto&_2:_1)cin>>_2
-#define repeat(i, X) for (int i=0; i<((X)); i++)
-#define BIG 100000007
-#define SUPER_BIG 987654321123456789
+#define custom_pq(X) priority_queue<X, vector<X>, X>
 
-typedef long long ll;
 typedef vector<int> vi;
-typedef vector<char> vc;
-typedef pair<int, int> pii;
-typedef set<int> si;
-typedef vector<vi> vvi;
 typedef vector<bool> vb;
-typedef vector<ll> vll;
-typedef vector<pii> vpii;
-typedef vector<vpii> vvpii;
-typedef vector<string> vs;
-typedef priority_queue<int, vi, greater<>> mq;
-typedef priority_queue<pii, vpii, greater<>> mpq;
-
-void solve();
+typedef vector<vi> vvi;
+typedef long long ll;
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    cout.tie(NULL);
-    solve();
-    return 0;
-}
+    cin.tie(nullptr);
+    cout.tie(nullptr);
 
-vvi G;
-int N, M;
-vi tpl;
-vb vtd;
-
-vi parse(const string &sss) {
-    vi ret;
-
-    int prev = 0;
-    for (int i = 0; i <= sss.length(); i++) {
-        if (i == sss.length() || sss[i] == ' ') {
-            ret.emplace_back(stoi(sss.substr(prev, i - prev)));
-            prev = i + 1;
+    int n, m;
+    cin >> n >> m;
+    vvi g(n + 1);
+    vi indegree(n + 1, 0);
+    RP(_, m) {
+        int k, u;
+        cin >> k >> u;
+        RP(_, k - 1) {
+            int v;
+            cin >> v;
+            g[u].push_back(v);
+            indegree[v]++;
+            u = v;
         }
     }
 
-    return ret;
-}
-
-void dfs1(int u) {
-    vtd[u] = true;
-    for (int i = 0; i < G[u].size(); i++) {
-        int v = G[u][i];
-
-        if (vtd[v]) continue;
-        dfs1(v);
-    }
-    tpl.push_back(u);
-}
-
-void dfs(int st) {
     queue<int> q;
+    for (int i = 1; i <= n; i++) {
+        if (indegree[i] == 0) q.push(i);
+    }
 
-    q.push(st);
+    vi ans;
+    // 위상 정렬
+    for (int i = 0; i < n; i++) {
+        if (q.empty()) {
+            // 중간에 queue 가 비면 불가능.
+            cout << 0 << endl;
+            return 0;
+        }
 
-    while (!q.empty()) {
         int u = q.front();
         q.pop();
+        ans.push_back(u);
 
-        for (int i = 0; i < G[u].size(); i++) {
-            int v = G[u][i];
-
-            if (vtd[v]) continue;
-            vtd[v] = true;
-            q.push(v);
-        }
-    }
-}
-
-void solve() {
-    cin >> N >> M;
-
-    G = vvi(N + 1);
-    vtd = vb(N + 1, false);
-
-    string temp;
-    getline(cin, temp);
-    repeat(_, M) {
-        getline(cin, temp);
-        vi pi = parse(temp);
-
-        for (int i = 2; i < pi.size(); i++) {
-            G[pi[i - 1]].push_back(pi[i]);
+        for (int v : g[u]) {
+            indegree[v]--;
+            if (indegree[v] == 0) q.push(v);
         }
     }
 
-    for (int i = 1; i <= N; i++) {
-        if (vtd[i]) continue;
-        dfs1(i);
+    for (int a : ans) {
+        cout << a << endl;
     }
 
-    reverse(all(tpl));
-
-    vb bv = vb(N + 1, false);
-    // 뒤로가는 간선이 있으면 안돼.
-    for (int i = 1; i < tpl.size(); i++) {
-        bv[tpl[i]] = true;
-
-        for (int j = 0; j < G[tpl[i]].size(); j++) {
-            int v = G[tpl[i]][j];
-
-            if (bv[v]) {
-                // 역방향 간선이 존재.
-                cout << 0 << endl;
-                return;
-            }
-        }
-    }
-
-    for (int u : tpl) {
-        cout << u << endl;
-    }
+    return 0;
 }
