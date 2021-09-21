@@ -21,7 +21,7 @@ typedef long long ll;
 // 3. sort original node and print.
 
 int n, m, cnt = 0;
-vvi g, scc_g, scc;
+vvi g, scc;
 vi ind, scc_id, dfs_id;
 vb found_scc;
 stack<int> dfs_s;
@@ -33,11 +33,11 @@ void init_g() {
     found_scc = vb(n, false);
     dfs_s = stack<int>();
     cnt = 0;
+    scc.clear();
 }
 
 void init_scc() {
     int sn = scc.size();
-    scc_g = vvi(sn);
     ind = vi(sn, 0);
 
     for (int u = 0; u < n; u++) {
@@ -45,63 +45,27 @@ void init_scc() {
         for (int v : g[u]) {
             int vid = scc_id[v];
             if (uid == vid) continue;
-            scc_g[uid].push_back(vid);
+            ind[vid]++;
         }
-        sort(all(scc_g[uid]));
-        scc_g[uid].erase(unique(all(scc_g[uid])), scc_g[uid].end());
-    }
-
-    for (int u = 0; u < sn; u++) {
-        for (int v : scc_g[u]) {
-            ind[v]++;
-        }
-    }
+    } // O(n + m)
 }
 
-void solve() {
+void solve() { // O(n log n)
     int sn = scc.size();
-    vb reach(sn, false);
-    bool only_one = false;
-    queue<int> q;
-    vi ans;
-    for (int uid = 0; uid < sn; uid++) {
+    int ans_scc_node = -1;
+    for (int uid = 0; uid < sn; uid++) { // O(n)
         if (ind[uid] == 0) {
-            q.push(uid);
-            if (only_one == false) {
-                reach[uid] = true;
-                only_one = true;
+            if (ans_scc_node == -1) {
+                ans_scc_node = uid;
+            } else {
+                cout << "Confused" << endl << endl;
+                return;
             }
-            ans.push_back(uid);
         }
     }
 
-    for (int i = 0; i < sn; i++) {
-        int u = q.front();
-        q.pop();
-
-        for (int v : scc_g[u]) {
-            if (reach[u]) reach[v] = true;
-            ind[v]--;
-            if (ind[v] == 0) q.push(v);
-        }
-    }
-
-    for (int i = 0; i < sn; i++) {
-        if (!reach[i]) {
-            cout << "Confused" << endl;
-            return;
-        }
-    }
-
-    vi g_ans;
-    for (int a : ans) {
-        for (int i = 0; i < n; i++) {
-            if (scc_id[i] == a) g_ans.push_back(i);
-        }
-    }
-
-    sort(all(g_ans));
-    for (int a : g_ans) cout << a << endl;
+    sort(all(scc[ans_scc_node])); // O(nlogn)
+    for (int a : scc[ans_scc_node]) cout << a << endl; // O(n)
     cout << endl;
 }
 
@@ -121,6 +85,7 @@ int build_scc(int u) {
             int t = dfs_s.top();
             dfs_s.pop();
             found_scc[t] = true;
+            curScc.push_back(t);
             scc_id[t] = scc.size();
             if (t == u) break;
         }
@@ -132,7 +97,9 @@ int build_scc(int u) {
 
 void build() {
     for (int u = 0; u < n; u++) {
-        if (dfs_id[u] == -1) build_scc(u);
+        if (dfs_id[u] == -1) {
+            build_scc(u);
+        }
     }
 }
 
@@ -148,7 +115,7 @@ int main() {
 
         init_g();
 
-        RP(_, m) {
+        RP(i, m) {
             int a, b;
             cin >> a >> b;
             g[a].push_back(b);
