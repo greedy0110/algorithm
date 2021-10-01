@@ -22,7 +22,7 @@ vvi flow;
 int n, m;
 
 // s -> e 로 단순 증가 간선이 있냐? 이동할 수 있냐? 1로라도.
-bool find_s_to_e(int s, int e) {
+bool find_s_to_e(int s, int e) { // O(V+E)
     vi prev(n, -1);
     prev[s] = s;
     queue<int> q;
@@ -101,16 +101,16 @@ int main() {
         }
 
         int ans = 0;
+        // 포화간선 찾기
         for (int u = 0; u < n; u++) {
             for (int v = 0; v < n; v++) {
                 if (cap[u][v] == 0) continue;
                 if (cap[u][v] == flow[u][v]) {
+                    // u->v 간선의 용량을 1 줄였을 때.
+                    // u->v 로 여전히 1 만큼의 유량이 갈 수 있나? -> 갈수 있으면, crucial link가 아니다.
+
                     cap[u][v]--; // 1 줄여보고 경로를 찾는다.
-                    flow[u][v]--;
-                    flow[v][u]++;
-                    if (find_s_to_e(u, v)) ans += edge_counter[u][v];
-                    flow[u][v]++;
-                    flow[v][u]--;
+                    if (!find_s_to_e(u, v)) ans += edge_counter[u][v];
                     cap[u][v]++;
                 }
             }
